@@ -10,6 +10,8 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+void init_readcount_lock(void);
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
