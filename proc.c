@@ -88,6 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->tickets = 1;
 
   release(&ptable.lock);
 
@@ -494,6 +495,24 @@ kill(int pid)
   }
   release(&ptable.lock);
   return -1;
+}
+
+int settickets(int num_tickets)
+{
+  struct proc *p;
+  struct proc *curproc = myproc();
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if(p->pid == curproc->pid)
+    {
+      p->tickets = num_tickets;
+      return 0;
+      break;
+    }
+  }
+  return 0;
 }
 
 //PAGEBREAK: 36
