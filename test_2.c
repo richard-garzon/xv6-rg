@@ -1,18 +1,34 @@
 #include "types.h"
+#include "pstat.h"
 #include "user.h"
 
 int main(int argc, char *argv[])
 {
-  /*
-
-  int initial_tickets = cp->tickets;
-
   int ticket_amount = 13;
   settickets(ticket_amount);
+  printf(1,"called settickets\n");
 
-  int after_tickets = cp->tickets;
+  int curr_pid = getpid();
 
-  printf(1, "Initial tickets: %d\n", initial_tickets);
-  printf(1, "Tickets after calling settickets() with %d as an arg: %d\n", ticket_amount, cp->tickets);
-  */
+  struct pstat * ps = malloc(sizeof(struct pstat));
+
+  getpinfo(ps);
+
+  int i;
+  for(i = 0; i < NPROC; i++)
+  {
+      if(curr_pid == ps->pid[i])
+      {
+        printf(1, "found my proc\n");
+        if(ticket_amount == ps->tickets[i])
+        {
+          printf(1, "settickets worked\n");
+        } else
+        {
+          printf(1, "settickets did not work\n");
+        }
+      }
+  }
+  free(ps);
+  exit();
 }

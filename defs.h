@@ -9,6 +9,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct pstat;
 
 void init_readcount_lock(void);
 
@@ -123,6 +124,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 int             settickets(int);
+int             getpinfo(struct pstat*);
 
 
 // swtch.S
