@@ -90,6 +90,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->tickets = 1;
+  p->ticks = 0;
 
   release(&ptable.lock);
 
