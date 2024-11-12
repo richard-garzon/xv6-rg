@@ -315,6 +315,37 @@ wait(void)
   }
 }
 
+long int rand_state = 2;
+
+// generates a random number
+// https://en.wikipedia.org/wiki/Lehmer_random_number_generator
+long int
+get_random_number(long int * seed)
+{
+  long int val = (*seed * 1103515245 + 12345) % 0x7fffffff;
+  *seed = val;
+  return *seed;
+}
+
+// generates random number in the range [0, num_tickets]
+// https://stackoverflow.com/questions/2509679/how-to-generate-a-random-integer-number-from-within-a-range
+long
+get_winner(int num_tickets, long int *rand_state)
+{
+  unsigned long num_bins = (unsigned long) num_tickets +1;
+  unsigned long num_rand = (unsigned long) 0x7fffffff + 1;
+  unsigned long bin_size = num_rand / num_bins;
+  unsigned long defect = num_rand % num_bins;
+
+  long x;
+  do
+  {
+    x = get_random_number(rand_state);
+  } while (num_rand - defect <= (unsigned long)x);
+
+  return x / bin_size;
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
