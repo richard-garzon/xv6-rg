@@ -360,16 +360,44 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
+  long int winner = 0;
+  long int counter = 0;
+  long int total_tickets = 0;
+  uint ticks_tmp;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
-    // Loop over process table looking for process to run.
+
+    // get total number of tickets
     acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
+      if(p->state == RUNNABLE)
+      {
+        total_tickets += p->tickets;
+      }
+    }
+
+    winner = get_winner(total_tickets, &rand_state);
+
+    // Loop over process table looking for process to run.
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
+
+      counter += p->tickets;
+      if (counter <= winner)
+      {
+        continue;
+      }
+
+      // we are now on the process that won the lottery
+      // let's save the current tick number from the global ticks variable in trap.c
+      acquire(&tickslock);
+      ticks_tmp = ticks;
+      release(&tickslock);
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
@@ -384,6 +412,11 @@ scheduler(void)
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+
+      // now that the proc is done running, let's increment the ticks it ran for
+      acquire(&tickslock);
+      p->ticks += ticks - ticks_tmp;
+      release(&tickslock);
     }
     release(&ptable.lock);
 
