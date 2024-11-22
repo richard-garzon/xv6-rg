@@ -360,10 +360,6 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  long int winner = 0;
-  long int counter = 0;
-  long int total_tickets = 0;
-  uint ticks_tmp;
   
   for(;;){
     // Enable interrupts on this processor.
@@ -372,6 +368,8 @@ scheduler(void)
 
     // get total number of tickets
     acquire(&ptable.lock);
+    long int counter = 0;
+    long int total_tickets = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     {
       if(p->state == RUNNABLE)
@@ -380,23 +378,25 @@ scheduler(void)
       }
     }
 
-    winner = get_winner(total_tickets, &rand_state);
+    long int winner = get_winner(total_tickets, &rand_state);
 
     // Loop over process table looking for process to run.
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
-        continue;
-
-      counter += p->tickets;
-      if (counter <= winner)
       {
         continue;
       }
 
+      counter += p->tickets;
+
+      if (counter <= winner)
+      {
+        continue;
+      }
       // we are now on the process that won the lottery
       // let's save the current tick number from the global ticks variable in trap.c
       acquire(&tickslock);
-      ticks_tmp = ticks;
+      uint ticks_tmp = ticks;
       release(&tickslock);
 
       // Switch to chosen process.  It is the process's job
@@ -415,9 +415,22 @@ scheduler(void)
 
       // now that the proc is done running, let's increment the ticks it ran for
       acquire(&tickslock);
-      p->ticks += ticks - ticks_tmp;
+      p->ticks += (ticks - ticks_tmp);
       release(&tickslock);
     }
+
+    // This prints out the number of ticks for user procs that have more than one
+    // ticket, as well as the current OS tick (systicks). this lets us measure scheduling proportions
+    // at a given systick. leaving it commented out unless i wanna test the scheduler.
+    /*
+    for(int j = 0; j < NPROC; j++)
+    {
+      if(ptable.proc[j].pid > 0 && ptable.proc[j].tickets > 1)
+      {
+        cprintf("pid: %d tickets: %d ticks: %d, systicks: %d\n", ptable.proc[j].pid, ptable.proc[j].tickets, ptable.proc[j].ticks, ticks);
+      }
+    }
+    */
     release(&ptable.lock);
 
   }

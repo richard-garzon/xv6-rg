@@ -183,6 +183,7 @@ UPROGS=\
 	_zombie\
 	_test_1\
 	_test_2\
+	_test_3\
 	_ps\
 
 fs.img: mkfs README $(UPROGS)
@@ -253,7 +254,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c ps.c\
-	printf.c umalloc.c test_1.c test_2.c\
+	printf.c umalloc.c test_1.c test_2.c test_3.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 
