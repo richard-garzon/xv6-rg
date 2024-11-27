@@ -427,7 +427,7 @@ scheduler(void)
     {
       if(ptable.proc[j].pid > 0 && ptable.proc[j].tickets > 1)
       {
-        cprintf("pid: %d tickets: %d ticks: %d, systicks: %d\n", ptable.proc[j].pid, ptable.proc[j].tickets, ptable.proc[j].ticks, ticks);
+        cprintf("pid:%d tickets:%d ticks:%d systicks:%d\n", ptable.proc[j].pid, ptable.proc[j].tickets, ptable.proc[j].ticks, ticks);
       }
     }
     */
